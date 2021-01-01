@@ -1,3 +1,4 @@
+//package slack is mostly a wrapper to the slack-go package
 package slack
 
 import (
@@ -12,6 +13,7 @@ import (
 	"github.com/slack-go/slack/slackevents"
 )
 
+//NewSlackClient creates a new slack client and returns it
 func NewSlackClient(token string) *slack.Client {
 	api := slack.New(token)
 	return api

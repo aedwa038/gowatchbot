@@ -57,6 +57,7 @@ func Scrape(text string) (Heading, []Status) {
 	return headings, s
 }
 
+//Filter filters the list of Status Objects
 func Filter(vs []Status, f func(Status) bool) []Status {
 	vsf := make([]Status, 0)
 	for _, v := range vs {

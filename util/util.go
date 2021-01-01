@@ -24,6 +24,7 @@ var urlMap = map[string]string{
 	"gamestop":    "https://www.gamestop.com/video-games/playstation-5/consoles/products/playstation-5/11108140.html?utm_source=rakutenls&utm_medium=affiliate&utm_content=NowInStock&utm_campaign=10&utm_kxconfid=tebx5rmj3&cid=afl_10000087&affID=77777&sourceID=AKGBlS8SPlM-hW6_h0slKIJubMj1xEsEtg",
 }
 
+//Fetches the proper url from the url map mased on description
 func GetURL(description string) string {
 	d := strings.ToUpper(description)
 	for key, value := range urlMap {
@@ -36,6 +37,7 @@ func GetURL(description string) string {
 	return "#"
 }
 
+//Fetch gets the contents of a url
 func Fetch(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -53,6 +55,7 @@ func Fetch(url string) (string, error) {
 	return b.String(), err
 }
 
+// Hash Lazy function to hash the cron results
 func Hash(doc string) string {
 	// Dumb af, but it's a cheap way to specific the most generic thing
 	// you can :-/

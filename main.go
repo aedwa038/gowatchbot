@@ -25,6 +25,8 @@ var signingSecret = mustGetenv("SLACK_SIGNING_KEY")
 var api = slack.New(mustGetenv("SLACK_TOKEN"))
 var url = mustGetenv("URL")
 
+// eventHandler endpoints function that handles slack events.
+// We use this endpoint for slack verifcations and bot mentions
 func eventHandler(w http.ResponseWriter, r *http.Request) {
 
 	body, err := sc.GetRequestBody(r)
@@ -66,6 +68,7 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// handleIndex enpoint for  the app's homepage
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	if err := indexTmpl.Execute(w, nil); err != nil {
 		log.Printf("Error executing indexTmpl template: %s", err)
@@ -81,7 +84,7 @@ func getDate(db *sql.DB) (*time.Time, error) {
 	return &date, err
 }
 
-// indexHandler responds to requests with our greeting.
+// crawl endpoint intended to scrape a site  called throuhg appengines cron config.
 func crawl(w http.ResponseWriter, r *http.Request) {
 
 	dbUser := mustGetenv("DB_USER") // e.g. 'my-db-user'
