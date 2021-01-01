@@ -1,12 +1,14 @@
-db root password 01KoGE6P4naxnass
+# PS5 Stock watcher slack bot.
 
+Sample project.
 
-./cloud_sql_proxy -instances=<supple-cabinet-232200:us-east1:ps5stockdb>=tcp:3306 \
-                  -credential_file=config/supple-cabinet-232200-42a990a48f14.json 
+Slack bot used to monitor for  any avilable PS5's in stock.
+Only outputs the results to a single channel for now.
 
+Stack 
 
- database ps5watcherdb
- user ps5watcher
+Google App Engine
+Cloud SQL
+SLack api (of course)
 
-
- test date: Dec 28 2020 - 6:18 AM EST
+Project done mainly to get farmilar with Golang.
