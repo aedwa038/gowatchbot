@@ -1,0 +1,6 @@
+cron:
+- description: "daily summary job"
+  url: /crawl/
+  schedule: every 5 minutes
+  target: ps5watcherbot
+
