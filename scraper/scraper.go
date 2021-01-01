@@ -1,7 +1,6 @@
 package scraper
 
 import (
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -41,9 +40,6 @@ func Scrape(text string) (Heading, []Status) {
 			row = nil
 		})
 	})
-
-	fmt.Println("####### headings = ", len(headings), headings)
-	fmt.Println("####### rows = ", len(rows))
 
 	for i := 0; i < len(rows); i++ {
 		if len(rows[i]) >= 2 {
