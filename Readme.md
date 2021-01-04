@@ -1,8 +1,8 @@
-# PS5 Stock watcher slack bot.
+# Inventory Stock watcher slack bot in golang.
 
 Sample project.
 
-Slack bot used to monitor for  any avilable PS5's in stock.
+Slack bot used to monitor for  any avilable PS5's inventory in stock.
 Only outputs the results to a single channel for now.
 
 Stack 
