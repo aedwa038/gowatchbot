@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/aedwa038/ps5watcherbot/scraper"
-	"github.com/aedwa038/ps5watcherbot/util"
+	"github.com/aedwa038/gowatcherbot/scraper"
+	"github.com/aedwa038/gowatcherbot/util"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 )
@@ -19,6 +19,7 @@ func NewSlackClient(token string) *slack.Client {
 	return api
 }
 
+//GetRequestBody retreives the slack request from the http request
 func GetRequestBody(r *http.Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -27,6 +28,7 @@ func GetRequestBody(r *http.Request) ([]byte, error) {
 	return body, nil
 }
 
+// ValidateRequestBody validates the slack request
 func ValidateRequestBody(r http.Header, body []byte, signingSecret string) error {
 	sv, err := slack.NewSecretsVerifier(r, signingSecret)
 	if err != nil {
@@ -42,6 +44,7 @@ func ValidateRequestBody(r http.Header, body []byte, signingSecret string) error
 	return nil
 }
 
+//GetEvents gets the slack event inside of the request body
 func GetEvents(body []byte) (slackevents.EventsAPIEvent, error) {
 	eventsAPIEvent, err := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionNoVerifyToken())
 	if err != nil {
@@ -50,6 +53,7 @@ func GetEvents(body []byte) (slackevents.EventsAPIEvent, error) {
 	return eventsAPIEvent, nil
 }
 
+//HandleVerifcationRequest helper function for handling slack verifications
 func HandleVerifcationRequest(e slackevents.EventsAPIEvent, body []byte) (string, error) {
 	if e.Type == slackevents.URLVerification {
 		var r *slackevents.ChallengeResponse
@@ -60,6 +64,7 @@ func HandleVerifcationRequest(e slackevents.EventsAPIEvent, body []byte) (string
 	}
 	return "", nil
 }
+
 func Header(header string) slack.Block {
 	headerText := slack.NewTextBlockObject("plain_text", header, false, false)
 	headerSection := slack.NewSectionBlock(headerText, nil, nil)

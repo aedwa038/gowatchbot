@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/aedwa038/ps5watcherbot/util"
+	"github.com/aedwa038/gowatcherbot/util"
 )
 
 type Heading []string

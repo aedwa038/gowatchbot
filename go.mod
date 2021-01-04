@@ -1,4 +1,4 @@
-module github.com/aedwa038/ps5watcherbot
+module github.com/aedwa038/gowatcherbot
 
 go 1.14
 

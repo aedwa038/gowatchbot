@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,10 +10,10 @@ import (
 	"text/template"
 	"time"
 
-	psdb "github.com/aedwa038/ps5watcherbot/mysql"
-	"github.com/aedwa038/ps5watcherbot/scraper"
-	sc "github.com/aedwa038/ps5watcherbot/slack"
-	"github.com/aedwa038/ps5watcherbot/util"
+	psdb "github.com/aedwa038/gowatcherbot/mysql"
+	"github.com/aedwa038/gowatcherbot/scraper"
+	sc "github.com/aedwa038/gowatcherbot/slack"
+	"github.com/aedwa038/gowatcherbot/util"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
@@ -24,6 +23,7 @@ var indexTmpl = template.Must(template.ParseFiles("index.html"))
 var signingSecret = mustGetenv("SLACK_SIGNING_KEY")
 var api = slack.New(mustGetenv("SLACK_TOKEN"))
 var url = mustGetenv("URL")
+var slack_channel = mustGetenv("DEFAULT_SLACK_CHANNEL")
 
 // eventHandler endpoints function that handles slack events.
 // We use this endpoint for slack verifcations and bot mentions
@@ -89,7 +89,6 @@ func crawl(w http.ResponseWriter, r *http.Request) {
 
 	dbUser := mustGetenv("DB_USER") // e.g. 'my-db-user'
 	dbPwd := mustGetenv("DB_PASS")  // e.g. 'my-db-password'
-	slack_channel := mustGetenv("DEFAULT_SLACK_CHANNEL")
 	//dbTcpHost              = mustGetenv("DB_TCP_HOST")
 	//dbPort                 = mustGetenv("DB_PORT")
 	dbName := mustGetenv("DB_NAME")
@@ -97,14 +96,12 @@ func crawl(w http.ResponseWriter, r *http.Request) {
 
 	db, err := psdb.NewSocket(dbUser, dbPwd, instanceConnectionName, dbName)
 	if err != nil {
-		fmt.Fprintf(w, "Error %s", err)
-		return
+		log.Fatalf("Error connecting to Database %s", err)
 	}
 
 	date, err := getDate(db)
 	if err != nil {
-		fmt.Fprintf(w, "Error %s", err)
-		return
+		log.Fatalf("Error getting last stock update date from database %s", err)
 	}
 
 	text, err := util.Fetch(url)
@@ -113,39 +110,62 @@ func crawl(w http.ResponseWriter, r *http.Request) {
 	}
 	_, items := scraper.Scrape(text)
 
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Date.Before(items[j].Date)
+	})
+
+	//Filter old inventory updates
+	items = scraper.Filter(items, func(row scraper.Status) bool {
+		return row.Date.After(*date)
+	})
+
+	//get instock
 	instock := scraper.Filter(items, func(row scraper.Status) bool {
 		return strings.Contains(row.Data, "In Stock")
 	})
 
-	instock = scraper.Filter(instock, func(row scraper.Status) bool {
-		return row.Date.After(*date)
+	//get out of stock
+	outOfstock := scraper.Filter(items, func(row scraper.Status) bool {
+		return strings.Contains(row.Data, "Out of Stock")
 	})
 
-	sort.Slice(instock, func(i, j int) bool {
-		return instock[i].Date.Before(instock[j].Date)
-	})
-
-	if len(instock) > 0 {
-		mardownBlocks := make([]slack.Block, 0)
-		mardownBlocks = append(mardownBlocks, sc.Header("PS5 InStock Update on "+date.Format(util.DateTempate)))
-		mardownBlocks = append(mardownBlocks, sc.Divider())
-		for _, row := range sc.SectionTextBlocks(instock) {
-			mardownBlocks = append(mardownBlocks, row)
-		}
-		list := sc.Message(mardownBlocks)
-		api.PostMessage(slack_channel, slack.MsgOptionText("", false), list)
-
-	} else {
-		//api.PostMessage("ps5test", slack.MsgOptionText("No new PS5 stock updates Found :(", false))
-		log.Print("No new PS5 stock updates")
+	if err := sendMessage("PS5 InStock Update on "+date.Format(util.DateTempate), instock); err != nil {
+		log.Printf("unable to send slack instock of stock update")
+	}
+	if err := sendMessage("PS5 Out of Stock Update on "+date.Format(util.DateTempate), outOfstock); err != nil {
+		log.Printf("unable to send slack out of stock update")
 	}
 
 	if err = psdb.SaveCronResults(db, items); err != nil {
-		fmt.Fprintf(w, "Error %s", err)
+		log.Printf("error saving cron resutls %s", err)
 	}
 	if err = psdb.SaveAvailableResults(db, instock); err != nil {
-		fmt.Fprintf(w, "Error %s", err)
+		log.Printf("error saving cron resutls %s", err)
 	}
+
+	lastdate := items[len(items)-1].Date.Format(util.DateTempate)
+	log.Printf("Updating config to date: %v", lastdate)
+	if err := psdb.SaveConfig(db, util.CacheKey, lastdate); err != nil {
+		log.Fatalf(" unable to save last date to db: %v", err)
+	}
+}
+
+func sendMessage(header string, s []scraper.Status) error {
+
+	if len(s) > 0 {
+		mardownBlocks := make([]slack.Block, 0)
+		mardownBlocks = append(mardownBlocks, sc.Header(header))
+		mardownBlocks = append(mardownBlocks, sc.Divider())
+		for _, row := range sc.SectionTextBlocks(s) {
+			mardownBlocks = append(mardownBlocks, row)
+		}
+		list := sc.Message(mardownBlocks)
+		_, _, err := api.PostMessage(slack_channel, slack.MsgOptionText("", false), list)
+
+		return err
+	}
+
+	return nil
 }
 
 // mustGetEnv is a helper function for getting environment variables.

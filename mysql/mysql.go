@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aedwa038/ps5watcherbot/scraper"
-	"github.com/aedwa038/ps5watcherbot/util"
+	"github.com/aedwa038/gowatcherbot/scraper"
+	"github.com/aedwa038/gowatcherbot/util"
 )
 
 // initTCPConnectionPool initializes a TCP connection pool for a Cloud SQL
@@ -124,12 +124,6 @@ func SaveAvailableResults(db *sql.DB, results []scraper.Status) error {
 	if len(results) == 0 {
 		return nil
 	}
-	lastdate := results[len(results)-1].Date.Format(util.DateTempate)
-	fmt.Println(lastdate)
-	if err := SaveConfig(db, util.CacheKey, lastdate); err != nil {
-		return fmt.Errorf("DB.saveAvailableResults: %v", err)
-	}
-
 	if data, err := json.Marshal(results); err == nil {
 		if insForm, err := db.Prepare("INSERT INTO AvailablePS5(data, updated) VALUES(?, NOW())"); err == nil {
 			insForm.Exec(data)
