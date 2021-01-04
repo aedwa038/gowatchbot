@@ -21,7 +21,7 @@ import (
 
 var indexTmpl = template.Must(template.ParseFiles("index.html"))
 var signingSecret = mustGetenv("SLACK_SIGNING_KEY")
-var api = slack.New(mustGetenv("SLACK_TOKEN"))
+var api = sc.NewSlackClient(mustGetenv("SLACK_TOKEN"))
 var url = mustGetenv("URL")
 var slack_channel = mustGetenv("DEFAULT_SLACK_CHANNEL")
 
