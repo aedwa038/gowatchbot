@@ -50,7 +50,7 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	} else if ch == "" {
+	} else if ch != "" {
 		w.Header().Set("Content-Type", "text")
 		w.Write([]byte(ch))
 	}
