@@ -142,11 +142,12 @@ func crawl(w http.ResponseWriter, r *http.Request) {
 	if err = psdb.SaveAvailableResults(db, instock); err != nil {
 		log.Printf("error saving cron resutls %s", err)
 	}
-
-	lastdate := items[len(items)-1].Date.Format(util.DateTempate)
-	log.Printf("Updating config to date: %v", lastdate)
-	if err := psdb.SaveConfig(db, util.CacheKey, lastdate); err != nil {
-		log.Fatalf(" unable to save last date to db: %v", err)
+	if len(items) > 0 {
+		lastdate := items[len(items)-1].Date.Format(util.DateTempate)
+		log.Printf("Updating config to date: %v", lastdate)
+		if err := psdb.SaveConfig(db, util.CacheKey, lastdate); err != nil {
+			log.Fatalf(" unable to save last date to db: %v", err)
+		}
 	}
 }
 
