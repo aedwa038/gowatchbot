@@ -46,15 +46,6 @@ func eventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ch, err := sc.HandleVerifcationRequest(eventsAPIEvent, body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	} else if ch != "" {
-		w.Header().Set("Content-Type", "text")
-		w.Write([]byte(ch))
-	}
-
 	if eventsAPIEvent.Type == slackevents.CallbackEvent {
 		innerEvent := eventsAPIEvent.InnerEvent
 		switch ev := innerEvent.Data.(type) {
@@ -129,16 +120,13 @@ func crawl(w http.ResponseWriter, r *http.Request) {
 		return strings.Contains(row.Data, "Out of Stock")
 	})
 
-	if err := sendMessage("PS5 InStock Update on "+date.Format(util.DateTempate), instock); err != nil {
+	if err := sendMessage("PS5 InStock Update on "+time.Now().Format(util.DateTempate), instock); err != nil {
 		log.Printf("unable to send slack instock of stock update")
 	}
-	if err := sendMessage("PS5 Out of Stock Update on "+date.Format(util.DateTempate), outOfstock); err != nil {
+	if err := sendMessage("PS5 Out of Stock Update on "+time.Now().Format(util.DateTempate), outOfstock); err != nil {
 		log.Printf("unable to send slack out of stock update")
 	}
 
-	if err = psdb.SaveCronResults(db, items); err != nil {
-		log.Printf("error saving cron resutls %s", err)
-	}
 	if err = psdb.SaveAvailableResults(db, instock); err != nil {
 		log.Printf("error saving cron resutls %s", err)
 	}

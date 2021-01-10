@@ -17,7 +17,7 @@ var urlMap = map[string]string{
 	"playstation": "https://direct.playstation.com/en-us/consoles/console/playstation5-console.3005816",
 	"target":      "https://www.target.com/p/playstation-5-console/-/A-81114595?clkid=13fde857N4bab11ebb2d442010a246e33&lnm=115444&afid=Troposphere%20LLC&ref=tgt_adv_xasd0002",
 	"amazon":      "https://www.amazon.com/dp/B08FC6MR62?tag=nismain-20&linkCode=ogi&th=1&psc=1",
-	"bestby":      "https://www.bestbuy.com/site/sony-playstation-5-console/6426149.p?skuId=6426149&irclickid=0gBz1swPLxyLWuHxTSQPxVT4UkEyhURJR0Oj2M0&irgwc=1&ref=198&loc=Troposphere%20LLC&acampID=0&mpid=62662",
+	"best":        "https://www.bestbuy.com/site/sony-playstation-5-console/6426149.p?skuId=6426149&irclickid=0gBz1swPLxyLWuHxTSQPxVT4UkEyhURJR0Oj2M0&irgwc=1&ref=198&loc=Troposphere%20LLC&acampID=0&mpid=62662",
 	"sam":         "https://www.samsclub.com/b/playstation-4/7330129",
 	"b&h":         "https://www.bhphotovideo.com/c/buy/sony-ps5/ci/48556",
 	"walmart":     "https://www.walmart.com/ip/Sony-PlayStation-5/363472942?irgwc=1&sourceid=imp_xS9XpiwPLxyLTTgwUx0Mo38bUkEyhUTVR0Oj2M0&veh=aff&wmlspartner=imp_62662&clickid=xS9XpiwPLxyLTTgwUx0Mo38bUkEyhUTVR0Oj2M0&sharedid=&ad_id=612734&campaign_id=9383",
